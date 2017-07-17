@@ -146,9 +146,26 @@ modify_boot_menu() {
 cleanup_layout() {
     echo "Cleaning up $DVD_LAYOUT"
     find $DVD_LAYOUT -name TRANS.TBL -exec rm '{}' +
-    COMPS_XML=$(find $DVD_LAYOUT/repodata -name '*-minimal-x86_64-comps.xml' ! -name 'repomd.xml' -exec basename {} \;)
-    mv $DVD_LAYOUT/repodata/$COMPS_XML $DVD_LAYOUT/repodata/comps.xml
-    find $DVD_LAYOUT/repodata -type f ! -name 'comps.xml' -exec rm '{}' +
+}
+
+update_repo() {
+    comps=$DVD_LAYOUT/repodata/comps.xml
+    if [[ ! -e $comps ]]; then
+        for i in $DVD_LAYOUT/repodata/*-comps.xml $DVD_LAYOUT/repodata/*-comps*.xml; do
+            if [[ -e $i ]]; then
+                comps=$i
+                break
+            fi
+        done
+    fi
+    if [[ -e $comps ]]; then
+        createrepo --update -g $comps $DVD_LAYOUT
+    else
+        createrepo --update $DVD_LAYOUT
+    fi
+    if [[ -e $DVD_LAYOUT/repodata/productid ]]; then
+        modifyrepo $DVD_LAYOUT/repodata/productid $DVD_LAYOUT/repodata
+    fi
 }
 
 create_newiso() {
@@ -158,7 +175,7 @@ create_newiso() {
     modify_boot_menu
     echo "Preparing NEW ISO"
     pushd $DVD_LAYOUT > /dev/null 2>&1
-    createrepo -g repodata/comps.xml $DVD_LAYOUT
+    update_repo
     echo "Creating NEW ISO"
     mkisofs -r -R -J -T -v \
      -no-emul-boot -boot-load-size 4 -boot-info-table \
