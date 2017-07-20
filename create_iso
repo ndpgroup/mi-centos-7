@@ -177,7 +177,7 @@ create_newiso() {
     pushd $DVD_LAYOUT > /dev/null 2>&1
     update_repo
     echo "Creating NEW ISO"
-    mkisofs -r -R -J -T -v \
+    mkisofs -r -rational-rock -J -T -v \
      -no-emul-boot -boot-load-size 4 -boot-info-table \
      -V "$DVD_TITLE" -p "$PREPARER" \
      -A "$DVD_TITLE - $DVD_SUBTITLE" \
