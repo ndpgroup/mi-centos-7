@@ -159,9 +159,9 @@ update_repo() {
         done
     fi
     if [[ -e $comps ]]; then
-        createrepo --update -g $comps $DVD_LAYOUT
+        createrepo --workers=`nproc` --update -g $comps $DVD_LAYOUT
     else
-        createrepo --update $DVD_LAYOUT
+        createrepo --workers=`nproc` --update $DVD_LAYOUT
     fi
     if [[ -e $DVD_LAYOUT/repodata/productid ]]; then
         modifyrepo $DVD_LAYOUT/repodata/productid $DVD_LAYOUT/repodata
