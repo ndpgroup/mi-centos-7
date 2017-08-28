@@ -109,8 +109,10 @@ create_layout() {
 
     for d in $CUSTOM_RPMS; do
         if [[ -d $d ]]; then
+            mkdir -p $DVD_LAYOUT/Packages/custom
             echo "Copying custom RPMS from: $d"
-            find $d -type f '(' -name '*.rpm' -o -name '*GPG*' -o -name '*.asc' ')' -exec cp {} $DVD_LAYOUT/Packages \;
+            rsync -vt `repomanage -n -c -k 2 $d | grep -v 'src.rpm$'` $DVD_LAYOUT/Packages/custom/
+            find $d -type f '(' -name '*GPG*' -o -name '*.asc' ')' -print -exec cp {} $DVD_LAYOUT/Packages/custom \;
         fi
     done
 
